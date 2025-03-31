@@ -39,7 +39,7 @@ fsu-ada-accessibility-mapping/
 ├── environment.yml       # Conda environment file for reproducibility
 ├── .gitignore            # Ignore unnecessary files/folders in Git
 ├── README.md             # Project overview and instructions
-└── run_pipeline.py       # (Optional) Script to run full analysis pipeline
+└── run_pipeline.py       # Script to run full analysis pipeline
 ```
 
  ## Roadmap
