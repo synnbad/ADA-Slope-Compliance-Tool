@@ -22,10 +22,10 @@ This project analyzes pedestrian accessibility across Florida State University�
 
 ---
 
+
 ## Folder Structure
 
-## 📁 Folder Structure
-
+```
 fsu-ada-accessibility-mapping/
 ├── data/
 │   ├── raw/              # Original spatial datasets (shapefiles, DEMs, GeoJSON)
@@ -40,9 +40,7 @@ fsu-ada-accessibility-mapping/
 ├── .gitignore            # Ignore unnecessary files/folders in Git
 ├── README.md             # Project overview and instructions
 └── run_pipeline.py       # (Optional) Script to run full analysis pipeline
-
-
----
+```
 
  ## Roadmap
 
