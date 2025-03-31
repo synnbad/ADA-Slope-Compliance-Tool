@@ -24,26 +24,22 @@ This project analyzes pedestrian accessibility across Florida State University�
 
 ## Folder Structure
 
+## 📁 Folder Structure
+
 fsu-ada-accessibility-mapping/
-│
 ├── data/
-│   ├── raw/              ← Original spatial data (shapefiles, GeoJSON, elevation)
-│   └── processed/        ← Cleaned or transformed data used in the analysis
-│
-├── notebooks/            ← Jupyter notebooks for exploration and testing
-│
-├── scripts/              ← Python automation scripts (e.g., slope analysis, map gen)
-│
+│   ├── raw/              # Original spatial datasets (shapefiles, DEMs, GeoJSON)
+│   └── processed/        # Cleaned or classified data
+├── notebooks/            # Jupyter notebooks for exploration and analysis
+├── scripts/              # Python automation scripts
 ├── outputs/
-│   ├── maps/             ← Exported map images (PNG, PDF)
-│   └── reports/          ← Summaries, markdown reports, or PDF exports
-│
-├── docs/                 ← Planning notes, diagrams, flowcharts, screenshots
-│
-├── environment.yml       ← Conda environment setup file (Python + GIS libs)
-├── .gitignore            ← Files/folders to exclude from Git (e.g., *.pyc, .ipynb_checkpoints)
-├── README.md             ← Project description and usage guide
-└── run_pipeline.py       ← (Optional) Entry point to run the full pipeline
+│   ├── maps/             # Static map exports (PNG, PDF)
+│   └── reports/          # Summary reports (Markdown, PDF, etc.)
+├── docs/                 # Diagrams, flowcharts, and planning notes
+├── environment.yml       # Conda environment file for reproducibility
+├── .gitignore            # Ignore unnecessary files/folders in Git
+├── README.md             # Project overview and instructions
+└── run_pipeline.py       # (Optional) Script to run full analysis pipeline
 
 
 ---
