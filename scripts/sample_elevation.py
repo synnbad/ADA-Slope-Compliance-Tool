@@ -35,7 +35,7 @@ def sample_elevation_at_points(points_fp, raster_fp, output_fp):
 
     # Step 6: Save the output GeoJSON file with new elevation data
     gdf_points.to_file(output_fp, driver="GeoJSON")
-    print(f"✅ Elevation-sampled points saved to: {output_fp}")
+    print(f"Elevation-sampled points saved to: {output_fp}")
 
 if __name__ == "__main__":
     sample_elevation_at_points(

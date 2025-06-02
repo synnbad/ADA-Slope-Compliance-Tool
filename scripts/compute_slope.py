@@ -45,13 +45,13 @@ def compute_slopes_by_path(points_fp, output_fp):
     }, crs=gdf_points.crs)
 
     gdf_slopes.to_file(output_fp, driver="GeoJSON")
-    print(f"✅ Slope segments saved to: {output_fp}")
-    print(f"🚩 Non-compliant segments: {(~gdf_slopes['ada_compliant']).sum()}")
+    print(f"Slope segments saved to: {output_fp}")
+    print(f"Non-compliant segments: {(~gdf_slopes['ada_compliant']).sum()}")
 
     # Slope distribution debugging
-    print("\n📊 Slope Summary:")
+    print("\nSlope Summary:")
     print(gdf_slopes[["slope", "ada_compliant"]].describe())
-    print("\n🔝 Top 10 steepest segments:")
+    print("\nTop 10 steepest segments:")
     print(gdf_slopes.sort_values("slope", ascending=False).head(10))
 
     return gdf_slopes

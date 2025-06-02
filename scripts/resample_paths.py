@@ -43,8 +43,8 @@ def resample_paths_to_points(path_fp, output_fp, interval_meters=5):
     }, crs=gdf_paths.crs)
 
     gdf_points.to_file(output_fp, driver="GeoJSON")
-    print(f"✅ Resampled points with path IDs saved to: {output_fp}")
-    print(f"📌 Total points generated: {len(gdf_points)}")
+    print(f"Resampled points with path IDs saved to: {output_fp}")
+    print(f"Total points generated: {len(gdf_points)}")
 
 if __name__ == "__main__":
     resample_paths_to_points(
