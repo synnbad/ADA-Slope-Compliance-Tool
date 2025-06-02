@@ -1,58 +1,31 @@
-# Mapping Accessibility on Campus: A GIS Study of ADA-Compliant Pathways at FSU
+# ADA Slope Compliance Tool
 
-This project analyzes pedestrian accessibility across Florida State University’s campus using GIS, spatial data, and Python automation. The goal is to identify ADA-compliant pathways, assess slope and surface challenges, and generate visual tools that highlight accessibility conditions across campus.
+This project provides a GIS-based, Python-powered solution for analyzing pedestrian pathway accessibility. It identifies ADA-compliant segments based on slope, leveraging spatial data automation and visualization. Initially developed to analyze Florida State University (FSU) pathways, it is now a generalized tool to help institutions assess ADA pathway compliance.
 
----
+## Features
+- Analyze pathways for ADA compliance using elevation and slope
+- Automatically clean, resample, and evaluate spatial data
+- Generate visual outputs: compliance maps, elevation reports
+- Web-ready pipeline for user-uploaded raster inputs (GeoTIFFs)
+- Designed for expansion into a hosted web tool
 
-##  Goals
-
-- Analyze pedestrian pathways for ADA compliance based on slope and other attributes
-- Automate spatial data cleaning, classification, and visualization with Python
-- Generate clear visual outputs: maps, reports, or dashboards
-- Build a portfolio-worthy GIS and automation project
-
----
-
-## Tools & Technologies
-
-- **Python**: geopandas, rasterio, shapely, pandas, folium, matplotlib
-- **GIS Platforms**: QGIS or ArcGIS Pro (for manual inspection or export)
-- **Jupyter Notebooks**: Exploratory analysis and documentation
-- **GitHub**: Version control and portfolio hosting
-
----
+## Tech Stack
+- **Python Libraries:** geopandas, rasterio, shapely, matplotlib, pandas
+- **GIS Tools:** QGIS / ArcGIS Pro (for preprocessing)
+- **Visualization:** matplotlib, folium
+- **Hosting Prep:** AWS Free Tier (S3, EC2, Lambda or Streamlit Cloud)
+- **Version Control:** GitHub
 
 
-## Folder Structure
+## Roadmap
 
-```
-fsu-ada-accessibility-mapping/
-├── data/
-│   ├── raw/              # Original spatial datasets (shapefiles, DEMs, GeoJSON)
-│   └── processed/        # Cleaned or classified data
-├── notebooks/            # Jupyter notebooks for exploration and analysis
-├── scripts/              # Python automation scripts
-├── outputs/
-│   ├── maps/             # Static map exports (PNG, PDF)
-│   └── reports/          # Summary reports (Markdown, PDF, etc.)
-├── docs/                 # Diagrams, flowcharts, and planning notes
-├── environment.yml       # Conda environment file for reproducibility
-├── .gitignore            # Ignore unnecessary files/folders in Git
-├── README.md             # Project overview and instructions
-└── run_pipeline.py       # Script to run full analysis pipeline
-```
-
- ## Roadmap
-
-- [x] Set up project structure and environment
-- [x] Collect spatial datasets (paths, elevation, building footprints)
-- [x] Write Python scripts to analyze slopes and classify accessibility
-- [x] Generate automated maps and reports
-- [x] Build a AWS-hosted web App for the tool
-- [x] Final polish and documentation
-
----
+- Data cleaning, slope classification, and compliance visualization  
+- Export maps and markdown summaries  
+- **Next Phase: AWS-Hosted Web App**  
+  - Build web UI (Flask/Streamlit)  
+  - Accept GeoTIFF uploads  
+  - Return slope compliance maps & reports  
 
 ## License
+[MIT License](LICENSE) — free to use, adapt, and build upon.
 
-MIT License — feel free to adapt and build upon this work.
