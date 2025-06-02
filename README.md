@@ -46,10 +46,10 @@ fsu-ada-accessibility-mapping/
 
 - [x] Set up project structure and environment
 - [x] Collect spatial datasets (paths, elevation, building footprints)
-- [ ] Write Python script to analyze slopes and classify accessibility
-- [ ] Generate automated maps and reports
-- [ ] Build an interactive map or dashboard
-- [ ] Final polish and documentation
+- [x] Write Python scripts to analyze slopes and classify accessibility
+- [x] Generate automated maps and reports
+- [x] Build a AWS-hosted web App for the tool
+- [x] Final polish and documentation
 
 ---
 
