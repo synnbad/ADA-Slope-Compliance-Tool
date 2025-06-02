@@ -9,42 +9,42 @@ def generate_points_along_line(line, distance_interval):
     points = []
     total_length = line.length
 
-    # Generate points at every 'distance_interval' along the LineString
     for dist in range(0, int(total_length), distance_interval):
-        point = line.interpolate(dist)  # Interpolates a point at given distance
-        points.append(line.interpolate(dist))
-    
+        point = line.interpolate(dist)
+        points.append(point)
+
     return points
 
 def resample_paths_to_points(path_fp, output_fp, interval_meters=5):
     """
-    Loads pedestrian paths, resamples them into evenly spaced points,
-    and saves the result as a GeoJSON file (output format is hardcoded as GeoJSON).
+    Resamples each LineString in a path GeoDataFrame into evenly spaced points.
+    Tags each point with a 'path_id' corresponding to the original feature.
     """
-    # Load cleaned, reprojected pedestrian paths
     gdf_paths = gpd.read_file(path_fp)
 
-    resampled_points = []
+    if gdf_paths.crs.to_epsg() != 26917:
+        gdf_paths = gdf_paths.to_crs(epsg=26917)
 
-    # Loop through each LineString
-    for row in gdf_paths.itertuples():
+    all_points = []
+    path_ids = []
+
+    for idx, row in gdf_paths.iterrows():
         line = row.geometry
 
-        # Only process valid LineStrings
         if isinstance(line, LineString):
-            points = generate_points_along_line(line, distance_interval=interval_meters)
-            resampled_points.extend(points)
+            points = generate_points_along_line(line, interval_meters)
+            all_points.extend(points)
+            path_ids.extend([idx] * len(points))  # assign path_id based on row index
 
-    # Create a GeoDataFrame of points
-    # Ensure all elements in resampled_points are valid Point objects
-    valid_points = [pt for pt in resampled_points if isinstance(pt, Point)]
-    gdf_points = gpd.GeoDataFrame(geometry=valid_points, crs=gdf_paths.crs)
+    # Create output GeoDataFrame
+    gdf_points = gpd.GeoDataFrame({
+        "path_id": path_ids,
+        "geometry": all_points
+    }, crs=gdf_paths.crs)
 
-    # Save the resampled points
     gdf_points.to_file(output_fp, driver="GeoJSON")
-
-    print(f"Resampled points saved to: {output_fp}")
-    print(f"Total points generated from '{path_fp}': {len(gdf_points)}")
+    print(f"✅ Resampled points with path IDs saved to: {output_fp}")
+    print(f"📌 Total points generated: {len(gdf_points)}")
 
 if __name__ == "__main__":
     resample_paths_to_points(
