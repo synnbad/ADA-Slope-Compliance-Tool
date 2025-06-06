@@ -1,9 +1,10 @@
 import geopandas as gpd
 import rasterio
 
+
 def sample_elevation_at_points(points_fp, raster_fp, output_fp):
     """
-    Loads a GeoJSON of point features and samples elevation values 
+    Loads a GeoJSON of point features and samples elevation values
     from a DEM raster. The elevation is added to each point and saved
     to a new GeoJSON file.
     """
@@ -36,6 +37,7 @@ def sample_elevation_at_points(points_fp, raster_fp, output_fp):
     # Step 6: Save the output GeoJSON file with new elevation data
     gdf_points.to_file(output_fp, driver="GeoJSON")
     print(f"Elevation-sampled points saved to: {output_fp}")
+
 
 if __name__ == "__main__":
     sample_elevation_at_points(

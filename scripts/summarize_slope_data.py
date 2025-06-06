@@ -2,6 +2,7 @@ import geopandas as gpd
 import json
 import os
 
+
 def summarize_slope_compliance(slope_fp, output_md_fp=None, output_json_fp=None):
     """
     Loads a GeoJSON file with slope segment data and computes ADA compliance summary.
@@ -49,7 +50,8 @@ def summarize_slope_compliance(slope_fp, output_md_fp=None, output_json_fp=None)
         os.makedirs(os.path.dirname(output_json_fp), exist_ok=True)
         with open(output_json_fp, "w") as f:
             json.dump(summary, f, indent=4)
-        print("JSON summary saved to:", output_json_fp)
+    print("JSON summary saved to:", output_json_fp)
+
 
 if __name__ == "__main__":
     summarize_slope_compliance(

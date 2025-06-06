@@ -1,5 +1,6 @@
 import geopandas as gpd
 
+
 def inspect_paths(path_fp):
     # Load the path dataset (GeoJSON) using GeoPandas
     # Each row in this GeoDataFrame represents a geographic feature, like a footpath or sidewalk
@@ -26,6 +27,7 @@ def inspect_paths(path_fp):
     # Step 4: Display a sample path geometry to verify structure
     print("\nSample LineString geometry:")
     print(gdf.geometry.iloc[0])
+
 
 if __name__ == "__main__":
     # Main entry point for standalone script execution

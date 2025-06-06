@@ -1,6 +1,7 @@
 import geopandas as gpd
 import matplotlib.pyplot as plt
 
+
 def plot_paths_and_points(paths_fp, points_fp):
     """
     Loads the pedestrian paths and resampled points,
@@ -36,6 +37,7 @@ def plot_paths_and_points(paths_fp, points_fp):
 
     # Display the plot interactively
     plt.show()
+
 
 if __name__ == "__main__":
     # Entry point for running the script

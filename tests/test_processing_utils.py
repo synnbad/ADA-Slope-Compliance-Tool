@@ -4,8 +4,8 @@ import geopandas as gpd
 from shapely.geometry import Point
 import pytest
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from processing_utils import compute_slope_segments
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # noqa: E402
+from processing_utils import compute_slope_segments  # noqa: E402
 
 
 def test_compute_slope_segments_basic():

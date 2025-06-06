@@ -6,6 +6,7 @@ from shapely.geometry import LineString
 
 ADA_SLOPE_THRESHOLD = 0.05  # 5%
 
+
 def sample_elevation_at_points(points_gdf, dem_path):
     with rasterio.open(dem_path) as src:
         # Reproject to match raster CRS
@@ -28,6 +29,7 @@ def sample_elevation_at_points(points_gdf, dem_path):
         points_gdf = points_gdf.to_crs("EPSG:26917")
 
     return points_gdf
+
 
 def compute_slope_segments(points_gdf):
     """
@@ -77,4 +79,3 @@ def compute_slope_segments(points_gdf):
         "ada_compliant": compliance,
         "geometry": segments
     }, crs=points_gdf.crs)
-
