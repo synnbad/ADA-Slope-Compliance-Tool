@@ -1,3 +1,6 @@
 {
     "total_segments": 8980,
-    "ada_compliant_segments": 
+    "ada_compliant_segments": 6429,
+    "non_compliant_segments": 2551,
+    "compliance_percentage": 71.59
+}
