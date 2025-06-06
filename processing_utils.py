@@ -77,3 +77,4 @@ def compute_slope_segments(points_gdf):
         "ada_compliant": compliance,
         "geometry": segments
     }, crs=points_gdf.crs)
+
