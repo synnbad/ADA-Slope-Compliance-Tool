@@ -56,10 +56,10 @@ Processed files and reports will be written to the `outputs/` directory.
 
 ## Running Tests
 
-Install the development requirements to get `pytest`:
+Install the project requirements (includes `pytest`):
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 ```
 
 Then run the test suite from the project root:
