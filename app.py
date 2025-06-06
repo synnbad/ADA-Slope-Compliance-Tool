@@ -71,7 +71,7 @@ def render_map(gdf_slopes):
     st.pyplot(fig)
 
 def main():
-    st.title("🦽 ADA Slope Compliance Tool")
+    st.title("ADA Slope Compliance Tool")
     st.markdown("Upload a DEM raster (GeoTIFF) and point GeoJSON to compute ADA slope compliance.")
 
     raster_file = st.file_uploader("Upload DEM raster (.tif)", type=["tif"])
