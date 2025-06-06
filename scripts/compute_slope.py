@@ -10,6 +10,10 @@ def compute_slopes_by_path(points_fp, output_fp):
     flags whether each segment is ADA compliant, and saves results.
     """
     gdf_points = gpd.read_file(points_fp)
+    if gdf_points.crs is None:
+        raise ValueError("Input data must have a CRS")
+    if gdf_points.crs.is_geographic:
+        gdf_points = gdf_points.to_crs("EPSG:26917")
 
     if "path_id" not in gdf_points.columns:
         raise ValueError("Missing 'path_id' field in points dataset. Ensure resampling included path_id tagging.")
@@ -34,7 +38,7 @@ def compute_slopes_by_path(points_fp, output_fp):
             segment = LineString([pt1.geometry, pt2.geometry])
             segments.append(segment)
             slopes.append(round(slope, 4))
-            compliance.append(slope <= ADA_SLOPE_THRESHOLD)
+            compliance.append(abs(slope) <= ADA_SLOPE_THRESHOLD)
             group_ids.append(path_id)
 
     gdf_slopes = gpd.GeoDataFrame({

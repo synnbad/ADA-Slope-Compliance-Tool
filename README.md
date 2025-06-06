@@ -16,6 +16,43 @@ This project provides a GIS-based, Python-powered solution for analyzing pedestr
 - **Hosting Prep:** AWS Free Tier (S3, EC2, Lambda or Streamlit Cloud)
 - **Version Control:** GitHub
 
+## Setup
+1. Clone the repository and enter the project directory
+   ```bash
+   git clone https://github.com/<your-org>/ADA-Slope-Compliance-Tool.git
+   cd ADA-Slope-Compliance-Tool
+   ```
+2. (Optional) create and activate a virtual environment
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+3. Install the required dependencies
+   ```bash
+   pip install geopandas rasterio shapely matplotlib pandas numpy folium streamlit
+   ```
+
+## How to Use
+
+### Streamlit Web App
+Run the interactive tool with
+```bash
+streamlit run app.py
+```
+Upload a DEM raster (.tif) and a GeoJSON of points with elevations to view ADA
+slope compliance results directly in your browser.
+
+### Command Line Workflow
+Each script in the `scripts/` folder performs a step in the processing pipeline:
+```bash
+python scripts/check_paths.py                 # clean and reproject path data
+python scripts/resample_paths.py              # generate evenly spaced points
+python scripts/sample_elevation.py            # sample DEM elevations
+python scripts/compute_slope.py               # compute slope segments
+python scripts/summarize_slope_data.py        # create a Markdown summary
+```
+Processed files and reports will be written to the `outputs/` directory.
+
 
 ## Roadmap
 
