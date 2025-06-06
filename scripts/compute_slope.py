@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 ADA_SLOPE_THRESHOLD = 0.05  # ADA compliance: 5% max slope
 
+
 def compute_slopes_by_path(points_fp, output_fp):
     """
     Computes slope segments between adjacent elevation points, grouped by path_id,
@@ -60,6 +61,7 @@ def compute_slopes_by_path(points_fp, output_fp):
 
     return gdf_slopes
 
+
 def plot_slope_segments(gdf):
     fig, ax = plt.subplots(figsize=(12, 10))
     gdf[gdf['ada_compliant']].plot(ax=ax, color='green', linewidth=1, label='ADA Compliant')
@@ -76,6 +78,7 @@ def plot_slope_segments(gdf):
     plt.axis('off')
     plt.savefig("outputs/maps/fsu_slope_gradient.png", dpi=300)
     plt.show()
+
 
 if __name__ == "__main__":
     output_fp = "data/processed/fsu_slope_segments.geojson"

@@ -1,6 +1,7 @@
 import geopandas as gpd
 import rasterio
 
+
 def check_crs_consistency(raster_fp, points_fp, elevation_points_fp):
     # Load raster
     with rasterio.open(raster_fp) as raster:
@@ -13,6 +14,7 @@ def check_crs_consistency(raster_fp, points_fp, elevation_points_fp):
     # Load output points with elevation
     gdf_elevated = gpd.read_file(elevation_points_fp)
     print(f"Elevation-Sampled Points CRS: {gdf_elevated.crs.to_string()}")
+
 
 if __name__ == "__main__":
     check_crs_consistency(

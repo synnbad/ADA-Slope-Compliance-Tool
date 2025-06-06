@@ -1,5 +1,6 @@
 import geopandas as gpd
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString
+
 
 def generate_points_along_line(line, distance_interval):
     """
@@ -14,6 +15,7 @@ def generate_points_along_line(line, distance_interval):
         points.append(point)
 
     return points
+
 
 def resample_paths_to_points(path_fp, output_fp, interval_meters=5):
     """
@@ -45,6 +47,7 @@ def resample_paths_to_points(path_fp, output_fp, interval_meters=5):
     gdf_points.to_file(output_fp, driver="GeoJSON")
     print(f"Resampled points with path IDs saved to: {output_fp}")
     print(f"Total points generated: {len(gdf_points)}")
+
 
 if __name__ == "__main__":
     resample_paths_to_points(
