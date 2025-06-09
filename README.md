@@ -4,7 +4,7 @@ This project provides a GIS-based, Python-powered solution for analyzing pedestr
 
 ## Features
 - Analyze pathways for ADA compliance using elevation and slope
-- Automatically clean, resample, and evaluate spatial data
+- Automatically clean, convert, resample, and evaluate spatial data
 - Generate visual outputs: compliance maps, elevation reports
 - Web-ready pipeline for user-uploaded raster inputs (GeoTIFFs)
 - Designed for expansion into a hosted web tool
@@ -46,7 +46,7 @@ slope compliance results directly in your browser.
 Each script in the `scripts/` folder performs a step in the processing pipeline:
 ```bash
 python scripts/check_paths.py                 # clean and reproject path data
-python scripts/resample_paths.py              # generate evenly spaced points
+python scripts/resample_paths.py              # convert polygons & generate points
 python scripts/sample_elevation.py            # sample DEM elevations
 python scripts/compute_slope.py               # compute slope segments
 python scripts/summarize_slope_data.py        # create a Markdown summary
@@ -67,6 +67,7 @@ Then run the test suite from the project root:
 ```bash
 pytest
 ```
+Sample GeoJSON data for conversion testing is available in `data/test/test_paths.geojson`.
 
 ## Roadmap
 

@@ -1,5 +1,6 @@
 import geopandas as gpd
 from shapely.geometry import LineString
+from processing_utils import convert_polygons_to_lines, align_crs
 
 
 def generate_points_along_line(line, distance_interval):
@@ -17,12 +18,15 @@ def generate_points_along_line(line, distance_interval):
     return points
 
 
-def resample_paths_to_points(path_fp, output_fp, interval_meters=5):
+def resample_paths_to_points(path_fp, output_fp, interval_meters=5, dem_fp=None):
     """
     Resamples each LineString in a path GeoDataFrame into evenly spaced points.
     Tags each point with a 'path_id' corresponding to the original feature.
     """
     gdf_paths = gpd.read_file(path_fp)
+    gdf_paths = convert_polygons_to_lines(gdf_paths)
+    if dem_fp:
+        gdf_paths = align_crs(gdf_paths, dem_fp)
 
     if gdf_paths.crs.to_epsg() != 26917:
         gdf_paths = gdf_paths.to_crs(epsg=26917)
@@ -53,5 +57,6 @@ if __name__ == "__main__":
     resample_paths_to_points(
         path_fp="data/processed/fsu_paths_cleaned.geojson",
         output_fp="data/processed/fsu_paths_resampled_points.geojson",
-        interval_meters=5
+        interval_meters=5,
+        dem_fp="data/raw/elevation_fsu.tif"
     )
