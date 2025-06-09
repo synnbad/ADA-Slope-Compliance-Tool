@@ -2,9 +2,32 @@
 
 import geopandas as gpd
 import rasterio
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Polygon, MultiPolygon
 
 ADA_SLOPE_THRESHOLD = 0.05  # 5%
+
+
+def convert_polygons_to_lines(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Convert Polygon and MultiPolygon geometries to LineStrings."""
+    lines = []
+    for geom in gdf.geometry:
+        if isinstance(geom, Polygon):
+            lines.append(LineString(geom.exterior.coords))
+        elif isinstance(geom, MultiPolygon):
+            for poly in geom.geoms:
+                lines.append(LineString(poly.exterior.coords))
+        elif isinstance(geom, LineString):
+            lines.append(geom)
+    return gpd.GeoDataFrame(geometry=lines, crs=gdf.crs)
+
+
+def align_crs(vector_gdf: gpd.GeoDataFrame, raster_path: str) -> gpd.GeoDataFrame:
+    """Reproject *vector_gdf* to match the CRS of *raster_path* if needed."""
+    with rasterio.open(raster_path) as src:
+        raster_crs = src.crs
+    if vector_gdf.crs != raster_crs:
+        vector_gdf = vector_gdf.to_crs(raster_crs)
+    return vector_gdf
 
 
 def sample_elevation_at_points(points_gdf, dem_path):
