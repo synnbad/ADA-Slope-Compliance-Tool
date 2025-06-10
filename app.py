@@ -6,6 +6,7 @@ from shapely.geometry import LineString, Point
 import matplotlib.pyplot as plt
 import os
 from tempfile import NamedTemporaryFile
+from fiona.errors import DriverError
 
 st.set_page_config(
     page_title="ADA Slope Compliance Tool",
@@ -127,7 +128,12 @@ def main():
             tmp_points.write(points_file.read())
             points_path = tmp_points.name
 
-        gdf_points = gpd.read_file(points_path)
+        try:
+            gdf_points = gpd.read_file(points_path)
+        except (IOError, DriverError) as e:
+            st.error(f"Error reading points file: {e}")
+            return
+
         gdf_sampled = sample_elevation(gdf_points, dem_path)
 
         slope_threshold = slope_percent / 100.0
