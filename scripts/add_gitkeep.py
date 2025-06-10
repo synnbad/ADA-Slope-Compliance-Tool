@@ -16,4 +16,4 @@ for folder in folders:
     keep_path = os.path.join(folder, ".gitkeep")
     with open(keep_path, "w") as f:
         pass  # Create empty file
-    print(f"✔️  .gitkeep added in {folder}")
+    print(f".gitkeep added in {folder}")

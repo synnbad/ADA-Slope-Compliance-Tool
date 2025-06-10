@@ -9,7 +9,6 @@ from tempfile import NamedTemporaryFile
 
 st.set_page_config(
     page_title="ADA Slope Compliance Tool",
-    page_icon="🦽",
     layout="wide",
 )
 
@@ -88,20 +87,52 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
     }, crs=points_gdf.crs)
 
 def render_map(gdf_slopes):
+    """Render a map of ADA compliant and non-compliant slope segments."""
+
+    # Check 1: Is the GeoDataFrame empty?
+    if gdf_slopes.empty:
+        st.warning("No slope segments were computed. Check your path and DEM alignment.")
+        return
+
+    # Check 2: Does it have geometry?
+    if "geometry" not in gdf_slopes.columns:
+        st.error("Slope segments are missing geometry.")
+        return
+
+    # Ensure geometry is active
+    try:
+        gdf_slopes = gdf_slopes.set_geometry("geometry")
+    except Exception as e:  # pragma: no cover - sanity check
+        st.error(f"Failed to activate geometry: {e}")
+        return
+
+    # Check 3: Validate 'ada_compliant' column
+    if "ada_compliant" not in gdf_slopes.columns:
+        st.error("Missing ADA compliance classification column.")
+        return
+
+    ada_yes = gdf_slopes[gdf_slopes["ada_compliant"] == True]
+    ada_no = gdf_slopes[gdf_slopes["ada_compliant"] == False]
+
+    if ada_yes.empty and ada_no.empty:
+        st.warning(
+            "Slope segments exist but none could be classified. Check elevation sampling."
+        )
+        return
+
     fig, ax = plt.subplots(figsize=(12, 8))
-    gdf_slopes[gdf_slopes['ada_compliant']].plot(
-        ax=ax, color='green', linewidth=1, label='ADA Compliant'
-    )
-    gdf_slopes[~gdf_slopes['ada_compliant']].plot(
-        ax=ax, color='red', linewidth=1.5, label='Non-Compliant'
-    )
-    plt.legend()
-    plt.axis('off')
-    plt.tight_layout()
+    if not ada_yes.empty:
+        ada_yes.plot(ax=ax, color="green", linewidth=1, label="ADA Compliant")
+    if not ada_no.empty:
+        ada_no.plot(ax=ax, color="red", linewidth=1, label="Non-Compliant")
+
+    ax.legend()
+    ax.set_title("ADA Slope Compliance Map")
+    ax.axis("off")
     st.pyplot(fig)
 
 def main():
-    st.title("🦽\ ADA Slope Compliance Tool")
+    st.title("ADA Slope Compliance Tool")
     st.markdown(
         "Upload a DEM raster (GeoTIFF) and a GeoJSON of points with elevations to analyze walkway compliance."
     )
@@ -139,10 +170,11 @@ def main():
 
         compliant = int(gdf_slopes["ada_compliant"].sum())
         non_compliant = len(gdf_slopes) - compliant
-        if len(gdf_slopes) > 0:
-            compliance_rate = round(100 * compliant / len(gdf_slopes))
-        else:
-            compliance_rate = 0
+        compliance_rate = (
+            round(100 * compliant / len(gdf_slopes), 2)
+            if len(gdf_slopes) > 0
+            else 0.0
+        )
 
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Total Segments", len(gdf_slopes))

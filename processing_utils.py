@@ -36,7 +36,7 @@ def sample_elevation_at_points(points_gdf, dem_path):
         if points_gdf.crs != src.crs:
             points_gdf = points_gdf.to_crs(src.crs)
 
-        # ✅ Only keep Point geometries
+        # Only keep Point geometries
         points_gdf = points_gdf[points_gdf.geometry.type == "Point"].copy()
 
         # Sample elevation values
