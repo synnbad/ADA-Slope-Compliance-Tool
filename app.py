@@ -1,8 +1,10 @@
 import streamlit as st
 import geopandas as gpd
 import rasterio
+import numpy as np
 from shapely.geometry import LineString, Point
 import matplotlib.pyplot as plt
+import os
 from tempfile import NamedTemporaryFile
 
 st.set_page_config(
@@ -12,7 +14,6 @@ st.set_page_config(
 )
 
 ADA_SLOPE_THRESHOLD = 0.05  # 5%
-
 
 def sample_elevation(points_gdf, dem_path):
     with rasterio.open(dem_path) as src:
@@ -34,7 +35,6 @@ def sample_elevation(points_gdf, dem_path):
         points_gdf = points_gdf.to_crs("EPSG:26917")
 
     return points_gdf
-
 
 def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE_THRESHOLD):
     """Compute slope segments with a sliding window of *window_size* points."""
@@ -87,7 +87,6 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
         "geometry": segments
     }, crs=points_gdf.crs)
 
-
 def render_map(gdf_slopes):
     fig, ax = plt.subplots(figsize=(12, 8))
     gdf_slopes[gdf_slopes['ada_compliant']].plot(
@@ -101,9 +100,8 @@ def render_map(gdf_slopes):
     plt.tight_layout()
     st.pyplot(fig)
 
-
 def main():
-    st.title("🦽 ADA Slope Compliance Tool")
+    st.title("🦽\ ADA Slope Compliance Tool")
     st.markdown(
         "Upload a DEM raster (GeoTIFF) and a GeoJSON of points with elevations to analyze walkway compliance."
     )
@@ -141,7 +139,10 @@ def main():
 
         compliant = int(gdf_slopes["ada_compliant"].sum())
         non_compliant = len(gdf_slopes) - compliant
-        compliance_rate = round(100 * compliant / len(gdf_slopes), 2)
+        if len(gdf_slopes) > 0:
+            compliance_rate = round(100 * compliant / len(gdf_slopes))
+        else:
+            compliance_rate = 0
 
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Total Segments", len(gdf_slopes))
@@ -163,6 +164,6 @@ def main():
     else:
         st.info("Upload data and click Compute to begin.")
 
-
 if __name__ == "__main__":
     main()
+
