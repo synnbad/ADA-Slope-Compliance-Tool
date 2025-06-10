@@ -81,5 +81,5 @@ def test_compute_smoothed_slopes_insufficient_points():
         crs="EPSG:26917",
     )
 
-    with pytest.raises(ValueError):
-        compute_smoothed_slopes(gdf, window_size=5)
+    result = compute_smoothed_slopes(gdf, window_size=5)
+    assert result.empty
