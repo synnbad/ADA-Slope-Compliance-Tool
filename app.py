@@ -63,6 +63,11 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
         # coordinates which can reorder curved paths incorrectly
         group = group.sort_index().reset_index(drop=True)
 
+        if len(group) < window_size:
+            raise ValueError(
+                f"Group {group_id} has {len(group)} point(s), fewer than window_size {window_size}"
+            )
+
         for i in range(half_window, len(group) - half_window):
             window = group.iloc[i - half_window:i + half_window + 1]
             if window["elevation"].isnull().any():

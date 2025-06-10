@@ -10,6 +10,7 @@ from processing_utils import (
     convert_polygons_to_lines,
     align_crs,
 )  # noqa: E402
+from app import compute_smoothed_slopes  # noqa: E402
 
 
 def test_compute_slope_segments_basic():
@@ -68,3 +69,17 @@ def test_align_crs(tmp_path):
     aligned = align_crs(gdf, str(raster_path))
 
     assert aligned.crs.to_string() == "EPSG:3857"
+
+
+def test_compute_smoothed_slopes_insufficient_points():
+    gdf = gpd.GeoDataFrame(
+        {
+            "path_id": [1, 1],
+            "elevation": [0.0, 1.0],
+            "geometry": [Point(0, 0), Point(10, 0)],
+        },
+        crs="EPSG:26917",
+    )
+
+    with pytest.raises(ValueError):
+        compute_smoothed_slopes(gdf, window_size=5)
