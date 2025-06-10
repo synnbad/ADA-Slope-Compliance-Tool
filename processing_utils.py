@@ -65,6 +65,7 @@ def compute_slope_segments(points_gdf):
         points_gdf = points_gdf.to_crs("EPSG:26917")
 
     if 'path_id' in points_gdf.columns:
+        points_gdf = points_gdf.dropna(subset=['path_id'])
         grouped = points_gdf.groupby('path_id')
     else:
         grouped = [(None, points_gdf)]

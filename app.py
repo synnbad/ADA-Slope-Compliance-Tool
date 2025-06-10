@@ -49,6 +49,7 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
 
     half_window = window_size // 2
     if 'path_id' in points_gdf.columns:
+        points_gdf = points_gdf.dropna(subset=['path_id'])
         grouped = points_gdf.groupby('path_id')
     else:
         grouped = [(None, points_gdf)]
@@ -65,9 +66,8 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
         group = group.sort_index().reset_index(drop=True)
 
         if len(group) < window_size:
-            raise ValueError(
-                f"Group {group_id} has {len(group)} point(s), fewer than window_size {window_size}"
-            )
+            # Skip groups that do not have enough points for the smoothing window
+            continue
 
         for i in range(half_window, len(group) - half_window):
             window = group.iloc[i - half_window:i + half_window + 1]
