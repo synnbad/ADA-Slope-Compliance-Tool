@@ -1,0 +1,9 @@
+FROM public.ecr.aws/lambda/python:3.11
+
+RUN yum install -y tar gzip && yum clean all
+
+COPY requirements.txt ./
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+COPY app ./app
+CMD [ "app.main.handler" ]
