@@ -1,83 +1,64 @@
-# ADA Slope Compliance Tool
+# ADA Slope Compliance Tool — AWS MVP
 
-This project provides a GIS-based, Python-powered solution for analyzing pedestrian pathway accessibility. It identifies ADA-compliant segments based on slope, leveraging spatial data automation and visualization. Initially developed to analyze Florida State University (FSU) pathways, it is now a generalized tool to help institutions assess ADA pathway compliance.
+Minimal FastAPI API on AWS Lambda (container) + API Gateway with a static S3 frontend. Upload a DEM GeoTIFF, compute slope, and see ADA-relevant summaries.
 
-## Features
-- Analyze pathways for ADA compliance using elevation and slope
-- Automatically clean, convert, resample, and evaluate spatial data
-- Generate visual outputs: compliance maps, elevation reports
-- Web-ready pipeline for user-uploaded raster inputs (GeoTIFFs)
-- Designed for expansion into a hosted web tool
+## Quickstart (Deployment)
 
-## Tech Stack
-- **Python Libraries:** geopandas, rasterio, shapely, matplotlib, pandas
-- **GIS Tools:** QGIS / ArcGIS Pro (for preprocessing)
-- **Visualization:** matplotlib, folium
-- **Hosting Prep:** AWS Free Tier (S3, EC2, Lambda or Streamlit Cloud)
-- **Version Control:** GitHub
-
-## Setup
-1. Clone the repository and enter the project directory
-   ```bash
-   git clone https://github.com/<your-org>/ADA-Slope-Compliance-Tool.git
-   cd ADA-Slope-Compliance-Tool
-   ```
-2. (Optional) create and activate a virtual environment
-   ```bash
-   python -m venv venv
-   source venv/bin/activate
-   ```
-3. Install the required dependencies
-   ```bash
-   pip install geopandas rasterio shapely matplotlib pandas numpy folium streamlit
-   ```
-
-## How to Use
-
-### Streamlit Web App
-Run the interactive tool with
+### 1) Build & Push the Lambda Image
 ```bash
-streamlit run app.py
-```
-Upload a DEM raster (.tif) and a GeoJSON of points with elevations to view ADA
-slope compliance results directly in your browser.
-
-### Command Line Workflow
-Each script in the `scripts/` folder performs a step in the processing pipeline:
-```bash
-python scripts/check_paths.py                 # clean and reproject path data
-python scripts/resample_paths.py              # convert polygons & generate points
-python scripts/sample_elevation.py            # sample DEM elevations
-python scripts/compute_slope.py               # compute slope segments
-python scripts/summarize_slope_data.py        # create a Markdown summary
-```
-Processed files and reports will be written to the `outputs/` directory.
-
-
-## Running Tests
-
-Install the project requirements (includes `pytest`):
-
-```bash
-pip install -r requirements.txt
+cd backend
+aws ecr create-repository --repository-name ada-slope-api || true
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+REGION=us-east-1
+aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+docker build -t ada-slope-api .
+docker tag ada-slope-api:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/ada-slope-api:latest
+docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/ada-slope-api:latest
 ```
 
-Then run the test suite from the project root:
-
+### 2) Provision Infra (Terraform)
 ```bash
+cd ../infra
+terraform init
+terraform apply -auto-approve \
+  -var="bucket_name=YOUR_UNIQUE_BUCKET" \
+  -var="lambda_image_uri=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/ada-slope-api:latest"
+```
+
+### 3) Deploy Frontend
+```bash
+cd ../frontend
+aws s3 sync . s3://YOUR_UNIQUE_BUCKET
+```
+
+### 4) Smoke Test
+```bash
+API=$(terraform -chdir=../infra output -raw http_api_url)
+
+# Create a tiny synthetic DEM
+python ../scripts/fetch_demo_data.py synthetic --pattern flat --out /tmp/flat_20x20.tif --shape 20 20
+
+# Upload
+curl -F "file=@/tmp/flat_20x20.tif" "$API/upload"
+# => {"job_id":"..."}
+
+# Results
+curl "$API/results/JOB_ID"
+```
+
+## Development & Tests
+```bash
+pip install -r backend/requirements.txt
+pip install ruff black mypy pytest pytest-cov hypothesis
 pytest
 ```
-Sample GeoJSON data for conversion testing is available in `data/test/test_paths.geojson`.
 
-## Roadmap
+## Architecture
 
-- Data cleaning, slope classification, and compliance visualization  
-- Export maps and markdown summaries  
-- **Next Phase: AWS-Hosted Web App**  
-  - Build web UI (Flask/Streamlit)  
-  - Accept GeoTIFF uploads  
-  - Return slope compliance maps & reports  
+See docs/architecture.mmd (Mermaid).
 
-## License
-[MIT License](LICENSE) — free to use, adapt, and build upon.
+## Notes
+
+- Thresholds default: running 5% (1:20), cross ~2.083% (1:48).
+- For rasterio/GDAL on Lambda: current wheels may suffice. If not, re-base Docker image on a GDAL-bundled base in a follow-up PR.
 

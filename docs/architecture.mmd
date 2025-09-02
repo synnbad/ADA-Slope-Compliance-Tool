@@ -1,0 +1,5 @@
+flowchart LR
+  FE[Static Frontend S3] -->|HTTPS| APIGW[API Gateway HTTP]
+  APIGW --> LAMBDA[Lambda Container: FastAPI+Mangum]
+  LAMBDA -->|future| DDB[(DynamoDB)]
+  LAMBDA -->|future| S3[(S3 Artifacts)]
