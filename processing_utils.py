@@ -1,105 +1,16 @@
-# processing_utils.py
+"""Backward compatibility shim for older imports.
 
-import geopandas as gpd
-import rasterio
-from shapely.geometry import LineString, Polygon, MultiPolygon
+This module re-exports the newer `ada_slope` package symbols so existing scripts
+that import `processing_utils` continue to work while the project migrates to
+the `ada_slope` package layout.
+"""
 
-ADA_SLOPE_THRESHOLD = 0.05  # 5%
+from ada_slope.core import convert_polygons_to_lines, compute_slope_segments
+from ada_slope.io import ensure_vector_matches_raster_crs as align_crs, sample_elevation_at_points
 
-
-def convert_polygons_to_lines(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    """Convert Polygon and MultiPolygon geometries to LineStrings."""
-    lines = []
-    for geom in gdf.geometry:
-        if isinstance(geom, Polygon):
-            lines.append(LineString(geom.exterior.coords))
-        elif isinstance(geom, MultiPolygon):
-            for poly in geom.geoms:
-                lines.append(LineString(poly.exterior.coords))
-        elif isinstance(geom, LineString):
-            lines.append(geom)
-    return gpd.GeoDataFrame(geometry=lines, crs=gdf.crs)
-
-
-def align_crs(vector_gdf: gpd.GeoDataFrame, raster_path: str) -> gpd.GeoDataFrame:
-    """Reproject *vector_gdf* to match the CRS of *raster_path* if needed."""
-    with rasterio.open(raster_path) as src:
-        raster_crs = src.crs
-    if vector_gdf.crs != raster_crs:
-        vector_gdf = vector_gdf.to_crs(raster_crs)
-    return vector_gdf
-
-
-def sample_elevation_at_points(points_gdf, dem_path):
-    with rasterio.open(dem_path) as src:
-        # Reproject to match raster CRS
-        if points_gdf.crs != src.crs:
-            points_gdf = points_gdf.to_crs(src.crs)
-
-        # Only keep Point geometries
-        points_gdf = points_gdf[points_gdf.geometry.type == "Point"].copy()
-
-        # Sample elevation values
-        coords = [(geom.x, geom.y) for geom in points_gdf.geometry]
-        elevations = list(src.sample(coords))
-        nodata = src.nodata or -9999
-        points_gdf["elevation"] = [val[0] if val and val[0] != nodata else None for val in elevations]
-
-    # Reproject sampled points to a metric CRS for distance-based calculations
-    if points_gdf.crs is None:
-        raise ValueError("Input GeoDataFrame must have a CRS")
-    if points_gdf.crs.is_geographic:
-        points_gdf = points_gdf.to_crs("EPSG:26917")
-
-    return points_gdf
-
-
-def compute_slope_segments(points_gdf):
-    """
-    Computes slope segments between consecutive points,
-    classifies ADA compliance, and returns a GeoDataFrame.
-    """
-    if points_gdf.crs is None:
-        raise ValueError("Input GeoDataFrame must have a CRS")
-    if points_gdf.crs.is_geographic:
-        points_gdf = points_gdf.to_crs("EPSG:26917")
-
-    if 'path_id' in points_gdf.columns:
-        points_gdf = points_gdf.dropna(subset=['path_id'])
-        grouped = points_gdf.groupby('path_id')
-    else:
-        grouped = [(None, points_gdf)]
-
-    segments = []
-    slopes = []
-    compliance = []
-    group_ids = []
-
-    for group_id, group in grouped:
-        # Skip empty or invalid geometries
-        group = group[group.geometry.notnull()]
-        # Preserve the original ordering of points for accurate slope
-        # calculations rather than sorting by coordinates
-        group = group.copy().sort_index().reset_index(drop=True)
-
-        for i in range(len(group) - 1):
-            pt1, pt2 = group.iloc[i], group.iloc[i + 1]
-            if pt1["elevation"] is None or pt2["elevation"] is None:
-                continue
-
-            elev_diff = pt2["elevation"] - pt1["elevation"]
-            dist = pt1.geometry.distance(pt2.geometry)
-            slope = elev_diff / dist if dist != 0 else 0
-
-            segment = LineString([pt1.geometry, pt2.geometry])
-            segments.append(segment)
-            slopes.append(round(slope, 4))
-            compliance.append(abs(slope) <= ADA_SLOPE_THRESHOLD)
-            group_ids.append(group_id)
-
-    return gpd.GeoDataFrame({
-        "path_id": group_ids,
-        "slope": slopes,
-        "ada_compliant": compliance,
-        "geometry": segments
-    }, crs=points_gdf.crs)
+__all__ = [
+    "convert_polygons_to_lines",
+    "align_crs",
+    "sample_elevation_at_points",
+    "compute_slope_segments",
+]

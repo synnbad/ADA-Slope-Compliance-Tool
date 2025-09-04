@@ -1,21 +1,35 @@
 import streamlit as st
 import geopandas as gpd
 import rasterio
-import numpy as np
-from shapely.geometry import LineString, Point
+from shapely.geometry import Point, LineString
 import matplotlib.pyplot as plt
-import os
 from tempfile import NamedTemporaryFile
-from fiona.errors import DriverError
+try:
+    from fiona.errors import DriverError
+except Exception:  # fiona may not be installed in all environments
+    DriverError = Exception
+import logging
+
+from ada_slope import core as core
+from ada_slope import io as aio
+from ada_slope.config import DEFAULT
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 st.set_page_config(
     page_title="ADA Slope Compliance Tool",
     layout="wide",
 )
 
-ADA_SLOPE_THRESHOLD = 0.05  # 5%
+# Thin adapter functions using ada_slope.core and ada_slope.io
 
-def sample_elevation(points_gdf, dem_path):
+
+def sample_elevation(points_gdf, dem_path: str):
+    """Sample elevation from a raster and add an 'elevation' column to points_gdf.
+
+    This is a thin wrapper around rasterio sampling and ensures CRS alignment.
+    """
     with rasterio.open(dem_path) as src:
         if points_gdf.crs is None:
             raise ValueError("Input points must have a CRS")
@@ -36,8 +50,13 @@ def sample_elevation(points_gdf, dem_path):
 
     return points_gdf
 
-def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE_THRESHOLD):
-    """Compute slope segments with a sliding window of *window_size* points."""
+
+def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=None):
+    """Compute slope segments with a sliding window of *window_size* points (original app logic).
+
+    Kept local to the app for now to preserve UI behavior used by tests. This function
+    uses point-to-point distance between window endpoints to compute the slope.
+    """
 
     if window_size < 3 or window_size % 2 == 0:
         raise ValueError("window_size must be an odd integer >= 3")
@@ -48,9 +67,9 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
         points_gdf = points_gdf.to_crs("EPSG:26917")
 
     half_window = window_size // 2
-    if 'path_id' in points_gdf.columns:
-        points_gdf = points_gdf.dropna(subset=['path_id'])
-        grouped = points_gdf.groupby('path_id')
+    if "path_id" in points_gdf.columns:
+        points_gdf = points_gdf.dropna(subset=["path_id"])
+        grouped = points_gdf.groupby("path_id")
     else:
         grouped = [(None, points_gdf)]
 
@@ -61,16 +80,13 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
 
     for group_id, group in grouped:
         group = group.loc[group.geometry.apply(lambda p: isinstance(p, Point))]
-        # Preserve the original ordering from the input instead of sorting by
-        # coordinates which can reorder curved paths incorrectly
         group = group.sort_index().reset_index(drop=True)
 
         if len(group) < window_size:
-            # Skip groups that do not have enough points for the smoothing window
             continue
 
         for i in range(half_window, len(group) - half_window):
-            window = group.iloc[i - half_window:i + half_window + 1]
+            window = group.iloc[i - half_window : i + half_window + 1]
             if window["elevation"].isnull().any():
                 continue
 
@@ -82,15 +98,22 @@ def compute_smoothed_slopes(points_gdf, window_size=3, slope_threshold=ADA_SLOPE
             segment = LineString([pt1.geometry, pt2.geometry])
             segments.append(segment)
             slopes.append(round(slope, 4))
-            compliance.append(abs(slope) <= slope_threshold)
+            if slope_threshold is None:
+                st_threshold = DEFAULT.ada_slope_threshold_pct / 100.0
+            else:
+                st_threshold = slope_threshold
+            compliance.append(abs(slope) <= st_threshold)
             group_ids.append(group_id)
 
-    return gpd.GeoDataFrame({
-        "path_id": group_ids,
-        "slope": slopes,
-        "ada_compliant": compliance,
-        "geometry": segments
-    }, crs=points_gdf.crs)
+    return gpd.GeoDataFrame(
+        {
+            "path_id": group_ids,
+            "slope": slopes,
+            "ada_compliant": compliance,
+            "geometry": segments,
+        },
+        crs=points_gdf.crs,
+    )
 
 def render_map(gdf_slopes):
     """Render a map of ADA compliant and non-compliant slope segments."""

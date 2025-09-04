@@ -1,5 +1,6 @@
 import geopandas as gpd
-from processing_utils import convert_polygons_to_lines, align_crs
+from ada_slope.core import convert_polygons_to_lines
+from ada_slope.io import ensure_vector_matches_raster_crs as align_crs
 
 
 def inspect_paths(path_fp, raster_fp=None):

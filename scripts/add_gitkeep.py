@@ -1,19 +1,30 @@
-import os
+from pathlib import Path
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # List of relative paths where we want .gitkeep files
-folders = [
+FOLDERS = [
     "data/raw",
     "data/processed",
     "notebooks",
     "scripts",
     "outputs/maps",
     "outputs/reports",
-    "docs"
+    "docs",
 ]
 
-for folder in folders:
-    os.makedirs(folder, exist_ok=True)  # Ensure folder exists
-    keep_path = os.path.join(folder, ".gitkeep")
-    with open(keep_path, "w") as f:
-        pass  # Create empty file
-    print(f".gitkeep added in {folder}")
+
+def add_gitkeeps(base_path: Path | str = ".") -> None:
+    base = Path(base_path)
+    for rel in FOLDERS:
+        folder = base / rel
+        folder.mkdir(parents=True, exist_ok=True)
+        keep_path = folder / ".gitkeep"
+        keep_path.touch(exist_ok=True)
+        logger.info(".gitkeep ensured: %s", keep_path)
+
+
+if __name__ == "__main__":
+    add_gitkeeps()
