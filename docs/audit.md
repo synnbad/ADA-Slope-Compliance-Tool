@@ -2,7 +2,7 @@
 
 ## Repo Structure & Clarity
 - **Findings:** 
-  - Good: Clean separation between UI (`app.py`), utilities (`processing_utils.py`), and tests
+  - Good: Clean separation between UI (`app.py`), utilities (`ada_slope` package), and tests
   - Good: Organized data/ and scripts/ folders
   - Issue: Mixed approaches - both Streamlit app and separate processing utils
   - Issue: No clear API structure for headless operation
@@ -14,6 +14,7 @@
   - Pin all dependencies to exact versions
   - Add comprehensive type hints
   - Separate processing logic from UI concerns
+ - Note: project migrated `processing_utils.py` into the `ada_slope` package; update any external callers accordingly.
 
 ## Core Logic & Correctness
 - **DEM handling:**
