@@ -1,6 +1,7 @@
 import geopandas as gpd
 from shapely.geometry import LineString
-from processing_utils import convert_polygons_to_lines, align_crs
+from ada_slope.core import convert_polygons_to_lines
+from ada_slope.io import ensure_vector_matches_raster_crs as align_crs
 
 
 def generate_points_along_line(line, distance_interval):

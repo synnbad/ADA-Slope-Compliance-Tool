@@ -5,12 +5,19 @@ from shapely.geometry import Point
 import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # noqa: E402
-from processing_utils import (
-    compute_slope_segments,
-    convert_polygons_to_lines,
-    align_crs,
-)  # noqa: E402
-from app import compute_smoothed_slopes  # noqa: E402
+from ada_slope.core import compute_slope_segments, convert_polygons_to_lines
+from ada_slope.io import ensure_vector_matches_raster_crs as align_crs
+
+# Import compute_smoothed_slopes from the top-level app.py to avoid package
+# name collisions with backend/app
+import importlib.util
+from pathlib import Path
+
+app_path = Path(os.path.dirname(os.path.dirname(__file__))) / "app.py"
+spec = importlib.util.spec_from_file_location("top_app", str(app_path))
+app_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(app_mod)
+compute_smoothed_slopes = app_mod.compute_smoothed_slopes
 
 
 def test_compute_slope_segments_basic():
