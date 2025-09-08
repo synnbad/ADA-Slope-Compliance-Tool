@@ -1,0 +1,6 @@
+numpy==1.26.4
+rasterio==1.3.9
+geopandas==0.14.4
+shapely==2.0.4
+pyproj==3.6.1
+urbanaccess==0.2.2
