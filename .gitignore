@@ -199,5 +199,9 @@ web/paths_ada_eval.geojson
 *_PLAN*.md
 *_ANALYSIS*.md
 
+# UI temporary files
+ui/temp_uploads/
+ui/temp_outputs/
+
 # OS
 .DS_Store
