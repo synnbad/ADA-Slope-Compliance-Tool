@@ -7,6 +7,7 @@ Creates a 10% planar slope DEM and two test paths:
 - Path across slope direction (should have ~0% running, ~10% cross)
 """
 import numpy as np
+import pandas as pd
 import geopandas as gpd
 import rasterio
 from rasterio.transform import from_origin
@@ -37,6 +38,7 @@ def create_test_dem(slope_pct=10.0, size=50):
     }
     
     tmp_dem = tempfile.NamedTemporaryFile(suffix='.tif', delete=False)
+    tmp_dem.close()  # Close file handle before writing
     with rasterio.open(tmp_dem.name, 'w', **profile) as dst:
         dst.write(elevation.astype(np.float32), 1)
     
@@ -56,6 +58,7 @@ def create_test_paths():
     }, crs='EPSG:3857')
     
     tmp_paths = tempfile.NamedTemporaryFile(suffix='.geojson', delete=False)
+    tmp_paths.close()  # Close file handle before writing
     paths_gdf.to_file(tmp_paths.name, driver='GeoJSON')
     return tmp_paths.name
 
@@ -79,18 +82,24 @@ def main():
         # Check results
         result_gdf = gpd.read_file(output_file)
         
-        print(f"Along-slope path: running={result_gdf.iloc[0]['running_max']:.1f}%, cross={result_gdf.iloc[0]['cross_max']:.1f}%")
-        print(f"Across-slope path: running={result_gdf.iloc[1]['running_max']:.1f}%, cross={result_gdf.iloc[1]['cross_max']:.1f}%")
-        
-        # Validate expectations
-        along_running = result_gdf.iloc[0]['running_max']
-        along_cross = result_gdf.iloc[0]['cross_max'] 
+        # Handle potential NaN values
+        along_running = result_gdf.iloc[0]['running_max'] 
+        along_cross = result_gdf.iloc[0]['cross_max']
         across_running = result_gdf.iloc[1]['running_max']
         across_cross = result_gdf.iloc[1]['cross_max']
         
+        def safe_format(val):
+            return f"{val:.1f}" if not pd.isna(val) else "NaN"
+            
+        print(f"Along-slope path: running={safe_format(along_running)}%, cross={safe_format(along_cross)}%")
+        print(f"Across-slope path: running={safe_format(across_running)}%, cross={safe_format(across_cross)}%")
+        
+        # Validate expectations (with NaN checks)
         success = (
-            8.0 < along_running < 12.0 and along_cross < 2.0 and  # Along slope: high running, low cross
-            across_running < 2.0 and 8.0 < across_cross < 12.0   # Across slope: low running, high cross
+            not pd.isna(along_running) and 8.0 < along_running < 12.0 and 
+            not pd.isna(along_cross) and along_cross < 2.0 and  
+            not pd.isna(across_running) and across_running < 2.0 and 
+            not pd.isna(across_cross) and 8.0 < across_cross < 12.0   
         )
         
         print(f"✅ Slope math validation: {'PASS' if success else 'FAIL'}")

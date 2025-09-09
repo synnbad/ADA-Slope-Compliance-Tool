@@ -12,13 +12,36 @@ import urbanaccess as ua
 PEDESTRIAN_TAGS = {"footway","path","pedestrian","steps","living_street","residential"}
 
 def main(bbox, out_path):
-    # bbox = [minx, miny, maxx, maxy] in WGS84
-    nodes, edges = ua.osm.load.ua_network_from_bbox(bbox=bbox)
-    gdf = gpd.GeoDataFrame(edges, geometry="geometry", crs="EPSG:4326")
+    # bbox = [minx, miny, maxx, maxy] in WGS84 -> convert to tuple
+    bbox_tuple = tuple(bbox)
+    nodes, edges = ua.osm.load.ua_network_from_bbox(bbox=bbox_tuple)
+    
+    # Debug: Check what columns we have
+    print(f"Available columns: {list(edges.columns)}")
+    
+    # UrbanAccess typically stores geometry in a different column or format
+    # Let's work with what we have and create geometry from coordinates
+    from shapely.geometry import LineString
+    
+    # Check if we have lat/lon columns or need to construct geometry
+    if 'geometry' in edges.columns:
+        gdf = gpd.GeoDataFrame(edges, geometry='geometry', crs="EPSG:4326")
+    else:
+        # Build geometry from node coordinates if needed
+        # This is a simplified approach - UrbanAccess edges connect node IDs
+        print("No geometry column found, creating simple GeoDataFrame")
+        gdf = gpd.GeoDataFrame(edges, crs="EPSG:4326")
+        
     if "highway" in gdf.columns:
         gdf = gdf[gdf["highway"].isin(PEDESTRIAN_TAGS)]
-    gdf.to_file(out_path, driver="GeoJSON")
-    print(f"Wrote {out_path} with {len(gdf)} features")
+        
+    print(f"Found {len(gdf)} pedestrian edges after filtering")
+    
+    if len(gdf) > 0:
+        gdf.to_file(out_path, driver="GeoJSON")
+        print(f"Wrote {out_path} with {len(gdf)} features")
+    else:
+        print("No pedestrian edges found to save")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
