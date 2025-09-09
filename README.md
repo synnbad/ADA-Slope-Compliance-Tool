@@ -1,10 +1,10 @@
-# ADA Slope Compliance — Lean Pipeline
+# ADA Slope Compliance Tool
 
-This repo evaluates pedestrian paths against a DEM for **running** (≤ 5%) and **cross-slope** (≤ ~2.083%) compliance, then renders a simple web map. No server needed.
+This repository evaluates pedestrian paths against a Digital Elevation Model (DEM) for **running** (≤ 5%) and **cross-slope** (≤ 2.083%) compliance, then renders results in a web map. No server infrastructure required.
 
 ## Quickstart
 
-> ⚠️ **DEM Requirements**: DEM must be projected (meters); if your DEM is EPSG:4326 or degrees, reproject first with `gdalwarp` or QGIS.
+**Important**: DEM must be projected in meters; if your DEM is EPSG:4326 or in degrees, reproject first with `gdalwarp` or QGIS.
 
 1) Put your DEM at `data/dem.tif` (**projected CRS in meters**).
 2) Create a venv and install deps:
@@ -57,42 +57,22 @@ aws s3 sync web/ s3://<your-bucket> --acl public-read
 
 MIT
 
-## 📈 Performance
+## Performance
 
-- **Processing Time**: 1-2 seconds for typical DEMs
-- **Memory Usage**: 512MB Lambda allocation
-- **File Support**: GeoTIFF format up to ~50MB
-- **Concurrent Users**: Auto-scales with AWS Lambda
-- **Cold Start**: ~3-5 seconds for first request
+- Processing time: 1-2 seconds for typical DEMs
+- Memory usage: Minimal Python environment
+- File support: GeoTIFF format
+- Scalability: Local processing, no server dependencies
 
-## 🔒 Security
-
-- AWS IAM roles with least privilege
-- HTTPS-only communication
-- No persistent user data storage
-- CloudWatch audit logging
-- S3 bucket policies for secure access
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'Add feature description'`)
+4. Push to the branch (`git push origin feature/your-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Deployment Issues**: Check [Deployment Guide](docs/deployment-guide.md) troubleshooting section
-- **Technical Questions**: Review [Implementation Summary](docs/implementation-complete.md)
-- **Mathematical Details**: See [Mathematical Foundations](docs/mathematical-foundations.md)
-- **API Usage**: Visit `/docs` endpoint on deployed API for interactive documentation
-
----
-
-**Ready to deploy?** Run `./scripts/deploy.sh` and have your ADA compliance tool running on AWS in minutes!
 

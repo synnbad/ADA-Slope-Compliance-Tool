@@ -1,0 +1,27 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature", 
+      "properties": {"name": "test_path_1"},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [10, -10],
+          [40, -10]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"name": "test_path_2"}, 
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [25, -40],
+          [25, -20]
+        ]
+      }
+    }
+  ]
+}

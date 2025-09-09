@@ -36,7 +36,7 @@ def demonstrate_gradient_computation():
     fig.suptitle("Mathematical Analysis of DEM Slope Computation", fontsize=16)
     
     for i, (name, dem) in enumerate(examples.items()):
-        logger.info("\n📊 %s:", name.upper())
+        logger.info("\n%s:", name.upper())
         logger.info("-" * 40)
         
         # Compute gradients manually for demonstration
@@ -90,7 +90,7 @@ def demonstrate_gradient_computation():
     output_dir.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_dir / "mathematical_demonstration.png", 
                dpi=150, bbox_inches='tight')
-    logger.info("\n📈 Visualization saved to: %s", 
+    logger.info("\nVisualization saved to: %s", 
                output_dir / 'mathematical_demonstration.png')
     
     return examples
@@ -232,11 +232,11 @@ if __name__ == "__main__":
         
         logger.info("\n✅ DEMONSTRATION COMPLETE")
         logger.info("📋 Summary: Analyzed %d different DEM types", len(examples))
-        logger.info("🎯 All mathematical concepts verified successfully")
+        logger.info("All mathematical concepts verified successfully")
         
     except ImportError as e:
         logger.warning("⚠️  Visualization skipped (missing matplotlib): %s", e)
-        logger.info("📊 Running text-only mathematical demonstration...")
+        logger.info("Running text-only mathematical demonstration...")
         
         demonstrate_mathematical_concepts()
         demonstrate_real_world_example()

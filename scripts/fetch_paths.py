@@ -16,7 +16,7 @@ def main(bbox, out_path):
     bbox_tuple = tuple(bbox)
     nodes, edges = ua.osm.load.ua_network_from_bbox(bbox=bbox_tuple)
     
-    # Debug: Check what columns we have
+    # Check available columns
     print(f"Available columns: {list(edges.columns)}")
     
     # UrbanAccess typically stores geometry in a different column or format

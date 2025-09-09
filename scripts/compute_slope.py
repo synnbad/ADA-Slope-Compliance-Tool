@@ -53,7 +53,7 @@ def compute_slopes_by_path(points_fp, output_fp):
     print(f"Slope segments saved to: {output_fp}")
     print(f"Non-compliant segments: {(~gdf_slopes['ada_compliant']).sum()}")
 
-    # Slope distribution debugging
+    # Slope distribution summary
     print("\nSlope Summary:")
     print(gdf_slopes[["slope", "ada_compliant"]].describe())
     print("\nTop 10 steepest segments:")
