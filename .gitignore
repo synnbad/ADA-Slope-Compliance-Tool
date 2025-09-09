@@ -194,5 +194,10 @@ outputs/*
 # Web local artifacts
 web/paths_ada_eval.geojson
 
+# Reports and documentation artifacts (keep local only)
+*REPORT*.md
+*_PLAN*.md
+*_ANALYSIS*.md
+
 # OS
 .DS_Store
